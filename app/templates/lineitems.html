@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--
+Borrowed from:
+https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
+-->
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Line Items</title>
+</head>
+
+<body>
+<div class="container">
+ <div class="row">
+ <p><h2>Line Items Data</h2>  </p>
+ <table id="example" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>campaign_id</th>
+                <th>campaign_name</th>
+                <th>line_item_name</th>
+                <th>booked_amount</th>
+                <th>actual_amount</th>
+                <th>adjustments</th>
+            </tr>
+        </thead>
+        <tbody>
+   {% for lineitem in lineitems.items %}
+   <tr>
+                <td>{{ lineitem.id}}</td>
+                <td>{{ lineitem.campaign_id}}</td>
+                <td>{{ lineitem.campaign_name}}</td>
+                <td>{{ lineitem.line_item_name}}</td>
+                <td>{{ lineitem.booked_amount}}</td>
+                <td>{{ lineitem.actual_amount}}</td>
+                <td>{{ lineitem.adjustments}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>id</th>
+                <th>campaign_id</th>
+                <th>campaign_name</th>
+                <th>line_item_name</th>
+                <th>booked_amount</th>
+                <th>actual_amount</th>
+                <th>adjustments</th>
+            </tr>
+        </tfoot>
+    </table>
+ </div>
+
+   <ul class="pagination">
+  {% if lineitems.has_prev %}
+   <li class="page-item"><a class="page-link" href="{{ url_for('views.lineitems', page_num=lineitems.prev_num) }}">Previous</a></li>
+  {% else %}
+   <li class="page-item disabled"><span class="page-link">Previous</span>
+  {% endif %}
+   </li>
+
+  {% for page in lineitems.iter_pages(left_edge=3, right_edge=3) %}
+  {% if page %}
+   <li class="page-item"><a class="page-link" href="{{ url_for('views.lineitems', page_num=page) }}">{{ page }}</a></li>
+  {% else %}
+   <li class="page-item disabled" id="example_ellipsis"><a href="#" class="page-link">…</a></li>
+  {% endif %}
+  {% endfor %}
+
+  {% if lineitems.has_next %}
+   <li class="page-item"><a class="page-link" href="{{ url_for('views.lineitems', page_num=lineitems.next_num) }}">Next</a></li>
+  {% else %}
+   <li class="page-item disabled"><span class="page-link">Next</span>
+  {% endif %}
+   </ul>
+
+
+</div>
+<style>
+table{
+    width:100%;
+}
+#example_filter{
+    float:right;
+}
+#example_paginate{
+    float:right;
+}
+label {
+    display: inline-flex;
+    margin-bottom: .5rem;
+    margin-top: .5rem;
+
+}
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: auto;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+</style>
+
+</body>
+</html>
