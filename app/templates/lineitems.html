@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
+{% extends "base.html" %}
+{% block title %} Line Items Data {% endblock %}
+{% block content %}
 <!--
 Borrowed from:
 https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
@@ -10,12 +10,6 @@ https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Line Items</title>
-</head>
-
-<body>
 <div class="container">
  <div class="row">
  <p><h2>Line Items Data</h2>  </p>
@@ -29,6 +23,7 @@ https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
                 <th>booked_amount</th>
                 <th>actual_amount</th>
                 <th>adjustments</th>
+                <th>billable_amount</th>
             </tr>
         </thead>
         <tbody>
@@ -41,6 +36,7 @@ https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
                 <td>{{ lineitem.booked_amount}}</td>
                 <td>{{ lineitem.actual_amount}}</td>
                 <td>{{ lineitem.adjustments}}</td>
+                <td>{{ lineitem.billable_amount}}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -53,6 +49,7 @@ https://tutorial101.blogspot.com/2020/03/python-flask-sqlalchemy-pagination.html
                 <th>booked_amount</th>
                 <th>actual_amount</th>
                 <th>adjustments</th>
+                <th>billable_amount</th>
             </tr>
         </tfoot>
     </table>
@@ -108,5 +105,4 @@ label {
 }
 </style>
 
-</body>
-</html>
+{% endblock %}

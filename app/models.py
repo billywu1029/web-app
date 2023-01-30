@@ -11,3 +11,4 @@ class LineItem(db.Model):
     booked_amount = db.Column(db.Float, nullable=False)
     actual_amount = db.Column(db.Float, nullable=False)
     adjustments = db.Column(db.Float, nullable=False)
+    billable_amount = db.Column(db.Float, nullable=False)
