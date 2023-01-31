@@ -1,8 +1,10 @@
 import os
 import json
+import boto3
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_sqlalchemy import inspect
 from werkzeug.utils import secure_filename
+from config import S3_BUCKET, S3_KEY, S3_SECRET
 from . import UPLOAD_FOLDER, db
 from .models import LineItem
 
@@ -25,8 +27,8 @@ def insert_rows_db(data: dict):
 @views.route('/uploader', methods=['POST'])
 def upload_file():
     if request.method == 'POST':
-        f = request.files['file']
-        f.save(os.path.join(UPLOAD_FOLDER, secure_filename(f.filename)))
+        file = request.files['file']
+        file.save(os.path.join(UPLOAD_FOLDER, secure_filename(file.filename)))
 
         fnames = os.listdir(UPLOAD_FOLDER)
         if not all(fname.endswith('.json') for fname in fnames):
@@ -41,8 +43,24 @@ def upload_file():
         db.drop_all()
         db.create_all()
         insert_rows_db(data)
+        print('File uploaded successfully to DB!')  # Ideally would want to flash/alert to user or log on server
 
-        print('File uploaded successfully!')  # Ideally would want to flash this or alert
+        # Future iterations: export the database.db itself as a file on Amazon S3
+        # (this way it would allow us to reflect any modifications made via the web app)
+        try:
+            s3_resource = boto3.resource(
+                's3',
+                aws_access_key_id=S3_KEY,
+                aws_secret_access_key=S3_SECRET
+            )
+            bucket = s3_resource.Bucket(S3_BUCKET)
+            bucket.Object(file.filename).put(Body=file)
+            print('File exported successfully to Amazon S3!')
+        except Exception as e:
+            print("Failed to export JSON to Amazon S3!")
+            print(e)
+            return redirect(url_for('views.upload'))
+
         return redirect(url_for('views.lineitems', page_num=1))
 
     print('Error! file not uploaded successfully')
