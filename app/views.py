@@ -29,11 +29,11 @@ def upload_file():
     if request.method == 'POST':
         file = request.files['file']
         file.save(os.path.join(UPLOAD_FOLDER, secure_filename(file.filename)))
-
         fnames = os.listdir(UPLOAD_FOLDER)
         if not all(fname.endswith('.json') for fname in fnames):
             for fname in fnames:
                 if not fname.endswith('.json'):
+                    print(f"Removing {fname}. Not JSON format.")
                     os.remove(os.path.join(UPLOAD_FOLDER, fname))
             return "<h>Uploaded a non-JSON file!</h1>"
 
@@ -48,6 +48,8 @@ def upload_file():
         # Future iterations: export the database.db itself as a file on Amazon S3
         # (this way it would allow us to reflect any modifications made via the web app)
         try:
+            # **Very important to reset the read cursor on the file so that there are bytes to read from** #
+            file.seek(0)
             s3_resource = boto3.resource(
                 's3',
                 aws_access_key_id=S3_KEY,
