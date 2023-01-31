@@ -10,7 +10,7 @@ The features I decided to implement were as follows:
     - I saw that the JSON was around 3MB and later that the table had 10000 rows (line-items). It would be overkill to use fancy databases since Flask's SQLAlchemy would already do for this small dataset. 
 2. Having a column in the table for each line-item's billable amount (actual_amount + adjustments)
     - This and the invoice grand total seemed very simple as long as the UI didn't pose problems. I knew how to get both from SQL queries so it was just a matter of displaying them properly (and figuring out how to run SQL queries in Flask).
-3. Show invoice grand total
+3. Show invoice grand total, and calculate invoice totals for different campaign id's.
 4. Integration with Amazon S3 - ability to export the uploaded JSON to an S3 bucket
     - I thought that this would be an appropriate challenge since I always wanted to learn more about using AWS since it's so ubiquitous. I do think that the integration I did covered most of the hard work of Amazon S3 setup; however, I didn't actually export the db itself. For the sake of simplicity and proof of concept I decided to go ahead and just upload the JSON itself to S3. I would imagine that extending this to export the DB wouldn't be too much more effort.
     - In order to store the AWS Access Key and the secret key, I went ahead with the design pattern of a .env file along with a config.py to store the environment variables. This would avoid hardcoding secrets and also decouple the secrets from the app's code itself, which is good practice as far as I'm aware.
@@ -40,4 +40,5 @@ The "intended" usage of the web app is the following (some limited error handlin
     - Uploading a new JSON overrides the old one on the server, on your S3 bucket, and the DB. This was done for simplicity's sake.
     - All non-JSON files are detected and removed by default too, to avoid any obvious file processing issues.
 2. Go to Invoice to see the grand total amount.
+    - There's no UI for this, but if you add a "/<`campaign_id`>" to the Invoice URL, it returns the invoice for just the line-items from this `campaign_id`.
 3. Check the JSON on your S3 bucket for fictitious downstream purposes.
