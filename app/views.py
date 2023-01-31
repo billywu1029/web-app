@@ -10,11 +10,11 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET'])
 def home():
-    return render_template('base.html')
+    return render_template('base.html', title="Home Page")
 
 @views.route('/upload')
 def upload():
-    return render_template('upload.html')
+    return render_template('upload.html', title="Upload Data JSON")
 
 def insert_rows_db(data: dict):
     for row in data:
@@ -48,7 +48,7 @@ def lineitems(page_num):
     inspector = inspect(db.engine)
     if inspector.has_table(LineItem.__tablename__):
         lineitems = LineItem.query.paginate(per_page=10, page=page_num, error_out=True)
-        return render_template('lineitems.html', lineitems=lineitems)
+        return render_template('lineitems.html', lineitems=lineitems, title="Display Line Items")
     else:
         return "Error: No DB Table Present. Please upload the data JSON!"
 
@@ -63,4 +63,4 @@ def invoice(campaign_id):
     result = db.session.execute(sql).fetchall()
     assert result and result[0]
     invoice = result[0][0]
-    return render_template('invoice.html', invoice=invoice)
+    return render_template('invoice.html', invoice=invoice, title="Display Invoice")
