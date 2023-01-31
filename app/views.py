@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_sqlalchemy import inspect
 from werkzeug.utils import secure_filename
 from . import UPLOAD_FOLDER, db
@@ -29,8 +29,11 @@ def upload_file():
         f.save(os.path.join(UPLOAD_FOLDER, secure_filename(f.filename)))
 
         fnames = os.listdir(UPLOAD_FOLDER)
-        if not any(fname.endswith('.json') for fname in fnames):
-            return "<h>No data uploaded yet!</h1>"
+        if not all(fname.endswith('.json') for fname in fnames):
+            for fname in fnames:
+                if not fname.endswith('.json'):
+                    os.remove(os.path.join(UPLOAD_FOLDER, fname))
+            return "<h>Uploaded a non-JSON file!</h1>"
 
         with open(os.path.join(UPLOAD_FOLDER, fnames[0]), "r") as f:
             data = json.load(f)
@@ -39,9 +42,11 @@ def upload_file():
         db.create_all()
         insert_rows_db(data)
 
-        return 'File uploaded successfully!'
+        print('File uploaded successfully!')  # Ideally would want to flash this or alert
+        return redirect(url_for('views.lineitems', page_num=1))
 
-    return 'Error! file not uploaded successfully'
+    print('Error! file not uploaded successfully')
+    return redirect(url_for('views.upload'))
 
 @views.route('/lineitems/<int:page_num>')
 def lineitems(page_num):
@@ -55,6 +60,9 @@ def lineitems(page_num):
 @views.route('/invoice', defaults={'campaign_id': None})
 @views.route('/invoice/<string:campaign_id>')
 def invoice(campaign_id):
+    inspector = inspect(db.engine)
+    if not inspector.has_table(LineItem.__tablename__):
+        return "Error: No DB Table Present. Please upload the data JSON!"
     if not campaign_id:
         sql = f"SELECT SUM(billable_amount) FROM {LineItem.__tablename__}"
     else:
